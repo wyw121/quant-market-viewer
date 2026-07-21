@@ -81,6 +81,20 @@
               <input id="sma-toggle" type="checkbox" checked />
               <span class="toggle" aria-hidden="true"></span>
             </label>
+            <div class="indicator-group">
+              <label class="toggle-row" for="bollinger-toggle">
+                <span>
+                  <strong>Bollinger bands</strong>
+                  <small>2 standard deviations</small>
+                </span>
+                <input id="bollinger-toggle" type="checkbox" />
+                <span class="toggle" aria-hidden="true"></span>
+              </label>
+              <label class="period-row" for="bollinger-period">
+                <span>Period</span>
+                <input id="bollinger-period" type="number" min="5" max="100" step="1" value="20" disabled />
+              </label>
+            </div>
           </section>
 
           <section class="sidebar-section metrics-section">
