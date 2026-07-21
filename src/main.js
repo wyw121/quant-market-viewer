@@ -3,6 +3,7 @@ import {
   ColorType,
   HistogramSeries,
   LineSeries,
+  LineStyle,
   createChart,
 } from 'lightweight-charts';
 import {
@@ -14,7 +15,7 @@ import {
   Upload,
   createIcons,
 } from 'lucide';
-import { simpleMovingAverage } from './indicators.js';
+import { bollingerBands, simpleMovingAverage } from './indicators.js';
 import { calculateSnapshot, createSampleData, parseMarketCsv } from './market-data.js';
 import './style.css';
 
@@ -36,6 +37,8 @@ const elements = {
   resetButton: document.querySelector('#reset-button'),
   modeButtons: [...document.querySelectorAll('[data-mode]')],
   smaToggle: document.querySelector('#sma-toggle'),
+  bollingerToggle: document.querySelector('#bollinger-toggle'),
+  bollingerPeriod: document.querySelector('#bollinger-period'),
   rowCount: document.querySelector('#row-count'),
   totalReturn: document.querySelector('#total-return'),
   volatility: document.querySelector('#volatility'),
@@ -90,6 +93,30 @@ const smaSeries = chart.addSeries(LineSeries, {
   title: 'SMA 20',
 });
 
+const bollingerUpperSeries = chart.addSeries(LineSeries, {
+  color: '#2d5bd1aa',
+  lineWidth: 1,
+  lineStyle: LineStyle.Dashed,
+  priceLineVisible: false,
+  lastValueVisible: false,
+  title: 'BB upper',
+});
+const bollingerMiddleSeries = chart.addSeries(LineSeries, {
+  color: '#65758b',
+  lineWidth: 1,
+  priceLineVisible: false,
+  lastValueVisible: false,
+  title: 'BB middle',
+});
+const bollingerLowerSeries = chart.addSeries(LineSeries, {
+  color: '#2d5bd1aa',
+  lineWidth: 1,
+  lineStyle: LineStyle.Dashed,
+  priceLineVisible: false,
+  lastValueVisible: false,
+  title: 'BB lower',
+});
+
 function formatPercent(value) {
   return new Intl.NumberFormat('en-US', {
     style: 'percent',
@@ -141,6 +168,23 @@ function renderTable() {
   );
 }
 
+function renderBollingerBands() {
+  if (!elements.bollingerToggle.checked) {
+    bollingerUpperSeries.setData([]);
+    bollingerMiddleSeries.setData([]);
+    bollingerLowerSeries.setData([]);
+    return;
+  }
+
+  const requestedPeriod = Number(elements.bollingerPeriod.value);
+  const period = Math.min(Math.max(Math.round(requestedPeriod || 20), 5), 100);
+  elements.bollingerPeriod.value = period;
+  const values = bollingerBands(state.bars, period);
+  bollingerUpperSeries.setData(values.map(({ time, upper }) => ({ time, value: upper })));
+  bollingerMiddleSeries.setData(values.map(({ time, middle }) => ({ time, value: middle })));
+  bollingerLowerSeries.setData(values.map(({ time, lower }) => ({ time, value: lower })));
+}
+
 function renderDashboard({ fit = true } = {}) {
   const { bars, quality } = state;
   const snapshot = calculateSnapshot(bars);
@@ -157,6 +201,7 @@ function renderDashboard({ fit = true } = {}) {
     })),
   );
   smaSeries.setData(elements.smaToggle.checked ? simpleMovingAverage(bars, 20) : []);
+  renderBollingerBands();
 
   elements.rowCount.textContent = `${bars.length} rows`;
   elements.totalReturn.textContent = formatPercent(snapshot.totalReturn);
@@ -215,6 +260,11 @@ elements.modeButtons.forEach((button) => {
 elements.smaToggle.addEventListener('change', () => {
   smaSeries.setData(elements.smaToggle.checked ? simpleMovingAverage(state.bars, 20) : []);
 });
+elements.bollingerToggle.addEventListener('change', () => {
+  elements.bollingerPeriod.disabled = !elements.bollingerToggle.checked;
+  renderBollingerBands();
+});
+elements.bollingerPeriod.addEventListener('change', renderBollingerBands);
 
 createIcons({
   icons: { ArrowRight, ChartCandlestick, ChartNoAxesCombined, Code2, RotateCcw, Upload },

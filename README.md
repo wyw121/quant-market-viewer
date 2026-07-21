@@ -3,7 +3,8 @@
 A local-first frontend for inspecting daily OHLCV market data. Import a CSV and
 switch between candlestick and close-price views while monitoring volume, a
 20-session simple moving average, total return, annualized volatility, and
-maximum drawdown.
+maximum drawdown. Optional Bollinger bands use a configurable 5-100 session
+window and two population standard deviations around the rolling mean.
 
 ## Run locally
 
