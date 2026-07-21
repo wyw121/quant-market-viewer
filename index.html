@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A local-first CSV market data viewer with candlestick and line charts."
+    />
+    <title>Quant Market Viewer</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">Q</div>
+          <div>
+            <h1>Quant Market Viewer</h1>
+            <p id="dataset-label">Synthetic daily sample</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <input id="file-input" type="file" accept=".csv,text/csv" hidden />
+          <button id="import-button" class="button primary" type="button">
+            <i data-lucide="upload" aria-hidden="true"></i>
+            Import CSV
+          </button>
+          <button
+            id="reset-button"
+            class="icon-button"
+            type="button"
+            aria-label="Load sample data"
+            title="Load sample data"
+          >
+            <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+          </button>
+          <a
+            class="icon-button"
+            href="https://github.com/wyw121/quant-market-viewer"
+            aria-label="Open GitHub repository"
+            title="Open GitHub repository"
+          >
+            <i data-lucide="code-2" aria-hidden="true"></i>
+          </a>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar">
+          <section class="sidebar-section">
+            <div class="section-heading">
+              <h2>View</h2>
+              <span id="row-count" class="count-label">0 rows</span>
+            </div>
+            <div class="segmented" aria-label="Chart type">
+              <button
+                class="segment active"
+                type="button"
+                data-mode="candlestick"
+                aria-label="Candlestick chart"
+                title="Candlestick chart"
+              >
+                <i data-lucide="chart-candlestick" aria-hidden="true"></i>
+              </button>
+              <button
+                class="segment"
+                type="button"
+                data-mode="line"
+                aria-label="Close price line chart"
+                title="Close price line chart"
+              >
+                <i data-lucide="chart-no-axes-combined" aria-hidden="true"></i>
+              </button>
+            </div>
+            <label class="toggle-row" for="sma-toggle">
+              <span>
+                <strong>SMA 20</strong>
+                <small>Close price</small>
+              </span>
+              <input id="sma-toggle" type="checkbox" checked />
+              <span class="toggle" aria-hidden="true"></span>
+            </label>
+          </section>
+
+          <section class="sidebar-section metrics-section">
+            <h2>Snapshot</h2>
+            <dl class="metric-list">
+              <div>
+                <dt>Total return</dt>
+                <dd id="total-return">--</dd>
+              </div>
+              <div>
+                <dt>Annualized volatility</dt>
+                <dd id="volatility">--</dd>
+              </div>
+              <div>
+                <dt>Maximum drawdown</dt>
+                <dd id="max-drawdown">--</dd>
+              </div>
+              <div>
+                <dt>Average volume</dt>
+                <dd id="average-volume">--</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="sidebar-section quality-section">
+            <h2>Data quality</h2>
+            <div class="quality-row">
+              <span>Rejected rows</span>
+              <strong id="rejected-rows">0</strong>
+            </div>
+            <div class="quality-row">
+              <span>Duplicate dates</span>
+              <strong id="duplicate-dates">0</strong>
+            </div>
+            <p id="status-message" class="status-message" role="status">Sample data loaded</p>
+          </section>
+        </aside>
+
+        <section class="chart-workspace" aria-label="Market chart">
+          <div class="chart-header">
+            <div>
+              <span class="eyebrow">Latest close</span>
+              <div class="latest-price-row">
+                <strong id="latest-price">--</strong>
+                <span id="latest-change" class="price-change">--</span>
+              </div>
+            </div>
+            <div class="date-range">
+              <span id="start-date">--</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span id="end-date">--</span>
+            </div>
+          </div>
+          <div id="chart" class="chart-container"></div>
+
+          <div class="table-band">
+            <div class="section-heading">
+              <h2>Recent sessions</h2>
+              <span>OHLCV</span>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                    <th>Volume</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
